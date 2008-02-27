@@ -7,15 +7,15 @@ Copyright by Affinitic sprl
 
 $Id$
 """
-from sqlalchemy import create_engine
-from sqlalchemy import MetaData
-from sqlalchemy.orm import clear_mappers, create_session, mapper
-from gites.ldapimport.tables import getProprio
-from gites.ldapimport.proprietaire import Proprietaire
+from sqlalchemy import create_engine, create_session
+from sqlalchemy import BoundMetaData, mapper
+from sqlalchemy.orm import clear_mappers
+from gites.ldapimports.tables import getProprio
 
+class Proprietaire(object):
+    pass
 
 class PGDB(object):
-
     def __init__(self, db_user, db_passwd, pg_host, pg_port, db_name,
                  table=None, table_columns=None):
         self.pg_string = 'postgres://%s:%s@%s:%s/%s' % (db_user, db_passwd,
@@ -27,7 +27,7 @@ class PGDB(object):
 
     def connect(self):
         self.db = self.engine.connect()
-        self.metadata = MetaData(self.engine)
+        self.metadata = BoundMetaData(self.engine)
 
     def setMappers(self):
         clear_mappers()
@@ -35,10 +35,10 @@ class PGDB(object):
         self.proprio.create(checkfirst=True)
 
         mapper(Proprietaire, self.proprio,
-               primary_key=[self.proprio.c.pro_pk], )
+               primary_key=[self.proprio.c.pro_pk],)
 
     def getProprioSession(self):
-        return create_session(bind=self.engine)
+        return create_session(bind_to=self.engine)
 
     def clearSession(self, session):
         session.flush()
@@ -49,6 +49,3 @@ class PGDB(object):
         del self.db
         del self.engine
 
-    def truncate(self, table):
-        self.db.drop(table, checkfirst=True)
-        table.create()
