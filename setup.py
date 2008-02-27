@@ -24,10 +24,14 @@ setup(
         "License :: OSI Approved"],
     packages = find_packages(),
     include_package_data = True,
-    package_dir = {'':'src'},
     namespace_packages = ['gites'],
     zip_safe = False,
     install_requires = [
         'setuptools',
+        'sqlalchemy',
+        'psycopg2',
+        'egenix-mx-base',
+        'pysqlite',
+        'python-ldap'
     ],
     )

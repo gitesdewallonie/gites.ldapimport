@@ -10,10 +10,8 @@ $Id$
 from sqlalchemy import create_engine, create_session
 from sqlalchemy import BoundMetaData, mapper
 from sqlalchemy.orm import clear_mappers
-from gites.ldapimports.tables import getProprio
-
-class Proprietaire(object):
-    pass
+from gites.ldapimport.tables import getProprio
+from gites.ldapimport.proprietaire import Proprietaire
 
 class PGDB(object):
     def __init__(self, db_user, db_passwd, pg_host, pg_port, db_name,
@@ -48,4 +46,8 @@ class PGDB(object):
         self.db.close()
         del self.db
         del self.engine
+
+    def truncate(self, table):
+        self.db.drop(table, checkfirst=True)
+        table.create()
 
