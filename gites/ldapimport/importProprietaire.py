@@ -9,65 +9,36 @@ $Id$
 """
 from gites.ldapimport.proprietaire import Proprietaire
 from gites.ldapimport.pg import PGDB
-from gites.ldapimport.ldapConnection import LDAP
-from gites.ldapimport.interfaces import ILDAPProprietaire
-from gites.ldapimport.registry import registry
-
 
 class ImportProprietaire(object):
     """
     Import proprietaire to ldif format in ldap
     """
 
-    def __init__(self, pg, ldap):
+    def __init__(self, pg):
         self.pg = pg
-        self.ldap = ldap
 
     def connect(self):
         self.pg.connect()
         self.pg.setMappers()
-        self.ldap.connect()
 
-    def getProprietaires(self, session):
-        return session.query(Proprietaire).all()
+    def getProprietaires(self):
+        session = self.pg.getProprioSession()
+        return session.query(Proprietaire).select()
 
     def createLdiff(self):
-        session = self.pg.getProprioSession()
-        ldifs = []
-        for proprietaire in self.getProprietaires(session):
-            ldapProprio = registry.queryAdapter(proprietaire,
-                                                ILDAPProprietaire)
-            ldifs.append(ldapProprio.ldif())
-        session.flush()
-        return "\n".join(ldifs)
+        for proprietaire in self.getProprietaires():
+            entry=dict(objectClass=['person', 'organizationalPerson',
+                                    'gites-proprietaire'],
+                       cn=[proprietaire.id],
+                       registeredAddress=[proprietaire.email],
+                       pk=[proprietaire.pro_pk],
+                       title=[proprietaire.title])
+            print entry
 
-    def updateLDAP(self):
-        session = self.pg.getProprioSession()
-        for proprietaire in self.getProprietaires(session):
-            ldapProprio = registry.queryAdapter(proprietaire,
-                                                ILDAPProprietaire)
-            dn, entryAttributes = ldapProprio.extract()
-            if self.ldap.searchUser(proprietaire.id):
-                if proprietaire.pro_etat == False:
-                    self.ldap.removeUser(dn)
-                    continue
-                else:
-                    self.ldap.updateUser(dn, entryAttributes)
-            else:
-                if proprietaire.pro_etat == True:
-                    self.ldap.addUser(dn, entryAttributes)
-                    self.ldap.addUserToGroup(dn, 'proprietaire')
-            session.add(proprietaire)
-        session.flush()
-
-
-def main():
-    pg = PGDB('jfroche', 'xMLMY4', 'localhost', 5432, 'gites_wallons')
-    ldap = LDAP('ldap://localhost', 'cn=admin,dc=gitesdewallonie,dc=net', 'phoneph0ne')
-    proprioImport = ImportProprietaire(pg, ldap)
-    proprioImport.connect()
-    #proprioImport.createLdiff()
-    proprioImport.updateLDAP()
 
 if __name__ == "__main__":
-    main()
+    pg = PGDB('jfroche', 'xMLMY4', 'localhost', 5432, 'gites_wallons')
+    prorioImport = ImportProprietaire(pg)
+    prorioImport.connect()
+    prorioImport.createLdiff()

@@ -7,82 +7,61 @@ Copyright by Affinitic sprl
 
 $Id$
 """
-from sqlalchemy import Table
+from sqlalchemy import Table, create_engine
+import unittest
 
 from gites.ldapimport.importProprietaire import ImportProprietaire
-from gites.ldapimport.proprietaire import Proprietaire
-from gites.ldapimport.tests.base import LDAPImportTestCase
+from gites.ldapimport.pg import PGDB, Proprietaire
+from gites.ldapimport.tables import getProprio
 
-VERNIQ_LDIFF = """
-dn: cn=verniq,ou=users,dc=gitesdewallonie,dc=net
-cn: verniq
-objectClass: person
-objectClass: organizationalPerson
-objectClass: gites-proprietaire
-pk: 2
-registeredAddress: vero@nique.be
-sn: verniq
-title: Vero Nique
-"""
+class ImportProprietaireTest(unittest.TestCase):
+    def _createdb(self, pg):
+        metadata = pg.metadata
+        table = getProprio(metadata)
+        table.create()
 
-
-class ImportProprietaireTest(LDAPImportTestCase):
+    def _fillDB(self):
+        p1 = Proprietaire(1)
+        p1.pro_prenom1 = u'Jean'
+        p1.pro_nom1 = u'Bon'
+        p1.pro_email = u'jean@bon.au'
+        p2 = Proprietaire(2)
+        p2.pro_prenom1 = u'Vero'
+        p2.pro_nom1 = u'Nique'
+        p2.pro_email = u'vero@nique.be'
+        session = self.importer.pg.getProprioSession()
+        session.save(p1)
+        session.save(p2)
+        session.flush()
 
     def setUp(self):
-        super(ImportProprietaireTest, self).setUp()
-        self.importer = ImportProprietaire(self.pg, self.ldapConn)
+        pg = PGDB('user','pwd','host',0,'dbname', 'gites')
+        pg.engine = create_engine('sqlite:///:memory:')
+        pg.connect()
+        pg.setMappers()
+        self.importer = ImportProprietaire(pg)
+        self.importer.pg = pg
         self.proprio = Table('proprio',
                              self.importer.pg.metadata)
 
-    def tearDown(self):
-        self.pg.truncate(self.proprio)
-        super(ImportProprietaireTest, self).tearDown()
-
-    def testUpdateLDAPWithoutExistingUsers(self):
-        self._fillDB()
-        result = self.importer.ldap.searchAll()
-        self.assertEqual(result, [])
-        self.assertRaises(AttributeError, self.importer.updateLDAP)
-
-    def testUpdateLDAPWithExistingUsers(self):
-        self._fillDB()
-        self._fillLDAP(self.importer.ldap._connection)
-        result = self.importer.ldap.searchAll()
-        self.assertEqual(len(result), 2)
-        self.importer.updateLDAP()
-        result = self.importer.ldap.searchAll()
-        self.assertEqual(len(result), 3)
-        proprietaireGroup = self.importer.ldap.searchGroup('proprietaire')
-        groupMembers = proprietaireGroup[0][1].get('uniqueMember')
-        self.assertEqual(groupMembers, ['cn=jefroc,ou=users,dc=gitesdewallonie,dc=net',
-                                        u'cn=jeabon,ou=users,dc=gitesdewallonie,dc=net',
-                                        u'cn=verniq,ou=users,dc=gitesdewallonie,dc=net'])
-        jeffUser = self.importer.ldap.searchUser('jefroc')
-        self.assertEqual(jeffUser[0][1].get('userPassword'), ['tototo'])
-        self.assertEqual(len(self.importer.ldap.searchAll()), 3)
-
     def testGetProprietaires(self):
         self._fillDB()
-        session = self.importer.pg.getProprioSession()
-        proprios = self.importer.getProprietaires(session)
-        self.assertEqual(len(proprios), 4)
-
-    def testCreateLdifWithoutPassword(self):
-        self._fillDB()
-        session = self.importer.pg.getProprioSession()
-        proprio = session.query(Proprietaire).filter_by(pro_nom1 = u'Nique').one()
-        self.assertEqual(proprio.pro_pass, u'')
-        self.importer.createLdiff()
-        session.refresh(proprio)
-        self.assertNotEqual(proprio.pro_pass, u'')
+        proprios = self.importer.getProprietaires()
+        self.assertEqual(len(proprios), 2)
 
     def testCreateLdiff(self):
         self._fillDB()
-        self.failUnless(VERNIQ_LDIFF in self.importer.createLdiff())
+        self.importer.createLdiff()
 
+    def tearDown(self):
+        self.importer.pg.truncate(self.proprio)
+        self.importer.pg.disconnect()
 
 def test_suite():
     from unittest import TestSuite, makeSuite
     suite = TestSuite()
     suite.addTest(makeSuite(ImportProprietaireTest))
     return suite
+
+if __name__ == '__main__':
+    unittest.main()
