@@ -8,6 +8,8 @@ Copyright by Affinitic sprl
 $Id$
 """
 import string
+from random import choice
+
 mapping_latin_chars = {
 138 : 's', 140 : 'O', 142 : 'z', 154 : 's', 156 : 'o', 158 : 'z', 159 : 'Y',
 192 : 'A', 193 : 'A', 194 : 'A', 195 : 'a', 196 : 'A', 197 : 'A', 198 : 'E',
@@ -33,3 +35,12 @@ def normalizeString(text):
             if mapping_latin_chars.has_key(ordinal):
                 res += mapping_latin_chars.get(ordinal)
     return res
+
+def generatePassword(passwordLength):
+    """
+    A simple script for making random passwords, WITHOUT 1,l,O,0.  Because
+    those characters are hard to tell the difference between in some fonts.
+
+    """
+    return ''.join([choice(string.letters+string.digits) for i in range(1,8)])
+

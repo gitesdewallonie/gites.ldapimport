@@ -24,7 +24,6 @@ from ldap import SCOPE_ONELEVEL
 from ldap import SCOPE_SUBTREE
 from ldap import MOD_ADD
 from ldap import MOD_DELETE
-from ldap import MOD_REPLACE
 
 from ldap import SERVER_DOWN
 from ldap import INVALID_CREDENTIALS
@@ -36,8 +35,6 @@ the_data = {}
 
 explode_dn = ldap.explode_dn
 
-def clearLDAP():
-    the_data.clear()
 
 class FakeLDAPObject(object):
 
@@ -157,7 +154,7 @@ class FakeLDAPObject(object):
                 res_entry = deepcopy(entry)
             res.append((dn, res_entry))
         if not has_base:
-            return None
+            raise NO_SUCH_OBJECT
         return res
 
     def modify_s(self, dn, mod_list):
@@ -189,7 +186,7 @@ class FakeLDAPObject(object):
                             raise NO_SUCH_OBJECT # FIXME
                 if not cur:
                     del entry[key]
-            elif op == MOD_REPLACE:
+            else: # op == MOD_REPLACE
                 if values:
                     entry[key] = values
                 elif entry.has_key(key):
