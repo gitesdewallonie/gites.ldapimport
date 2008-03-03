@@ -32,6 +32,7 @@ setup(
         'psycopg2',
         'egenix-mx-base',
         'pysqlite',
-        'python-ldap'
+        'python-ldap',
+        'zope.interface'
     ],
     )
