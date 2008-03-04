@@ -35,4 +35,7 @@ setup(
         'python-ldap',
         'zope.interface'
     ],
+    entry_points={
+            'console_scripts':[
+                'ldapSyncProprio = gites.ldapimport.importProprietaire:main',]}
     )
