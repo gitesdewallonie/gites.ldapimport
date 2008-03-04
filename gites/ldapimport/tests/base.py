@@ -14,7 +14,6 @@ from gites.ldapimport.proprietaire import Proprietaire
 from gites.ldapimport.tests import fakeldap
 from gites.ldapimport.ldapConnection import LDAP
 from gites.ldapimport.pg import PGDB
-from gites.ldapimport.registry import PROPRIO_LOGIN_REGISTRY
 import unittest
 import sys
 
@@ -28,14 +27,14 @@ import sys
 #        `-- jeff
 
 BASE ={'dc=net': [('cn', ['net'])],
-       'dc=gitesdewallonie,dc=net': [('cn', ['gitesdewallonie'])], }
+       'dc=gitesdewallonie,dc=net': [('cn', ['gitesdewallonie'])],}
 
-OU_BASE = {'ou=groups,dc=gitesdewallonie,dc=net': [('objectClass',
+OU_BASE = {'ou=groups,dc=gitesdewallonie,dc=net':[('objectClass',
                                                    ['organizationalUnit']),
-                                                     ('ou', ['groups']), ],
-           'ou=users,dc=gitesdewallonie,dc=net': [('objectClass',
+                                                     ('ou', ['groups']),],
+           'ou=users,dc=gitesdewallonie,dc=net':[('objectClass',
                                                   ['organizationalUnit']),
-                                                     ('ou', ['users']), ]}
+                                                     ('ou', ['users']),]}
 
 USERS = {'cn=jefroc,ou=users,dc=gitesdewallonie,dc=net':
          [('objectClass', ['person', 'organizationalPerson',
@@ -44,42 +43,32 @@ USERS = {'cn=jefroc,ou=users,dc=gitesdewallonie,dc=net':
           ('registeredAddress', ['jfroche@pyxel.be']),
           ('pk', ['444']),
           ('title', ['Jeff Roche']),
-          ('userPassword', ['tototo'])],
-         'cn=alameu,ou=users,dc=gitesdewallonie,dc=net':
-         [('objectClass', ['person', 'organizationalPerson',
-                           'gites-proprietaire']),
-          ('cn', ['alameu']),
-          ('registeredAddress', ['jfroche@pyxel.be']),
-          ('pk', ['444']),
-          ('title', ['Alain Meurant']),
           ('userPassword', ['tototo'])]}
 
 GROUPS = {'ou=proprietaire,ou=groups,dc=gitesdewallonie,dc=net':
-         [('objectClass', ['groupOfUniqueNames', ]),
+         [('objectClass', ['groupOfUniqueNames',]),
           ('cn', ['Proprietaire']),
           ('ou', ['proprietaire']),
           ('uniqueMember', ['cn=jefroc,ou=users,dc=gitesdewallonie,dc=net'])]}
 
-
 class LDAPImportTestCase(unittest.TestCase):
-
     def setUp(self):
-        if '_ldap' in sys.modules:
+        if sys.modules.has_key('_ldap'):
             self.old_uldap = sys.modules['_ldap']
             del sys.modules['_ldap']
         else:
             self.old_uldap = None
-        if 'ldap' in sys.modules:
+        if sys.modules.has_key('ldap'):
             self.old_ldap = sys.modules['ldap']
             del sys.modules['ldap']
         else:
             self.old_ldap = None
         sys.modules['ldap'] = fakeldap
-        self.pg = PGDB('user', 'pwd', 'host', 0, 'dbname', 'gites')
+        self.pg = PGDB('user','pwd','host',0,'dbname', 'gites')
         self.pg.engine = create_engine('sqlite:///:memory:')
         self.pg.connect()
         self.pg.setMappers()
-        self.ldapConn = LDAP('localhost', 'foo', 'bar')
+        self.ldapConn = LDAP('localhost','foo', 'bar')
         self.ldapConn._connection = fakeldap.FakeLDAPObject('dc=gitesdewallonie,dc=net')
         self._createLDAPStructure(self.ldapConn._connection)
 
@@ -89,39 +78,25 @@ class LDAPImportTestCase(unittest.TestCase):
         table.create()
 
     def _fillDB(self):
-        p1 = Proprietaire()
-        p1.pro_pk = 1
-        p1.pro_etat = True
+        p1 = Proprietaire(1)
         p1.pro_prenom1 = u'Jean'
         p1.pro_nom1 = u'Bon'
         p1.pro_email = u'jean@bon.au'
         p1.pro_pass = u'x24eee'
-        p2 = Proprietaire()
-        p2.pro_pk = 2
-        p2.pro_etat = True
+        p2 = Proprietaire(2)
         p2.pro_prenom1 = u'Vero'
         p2.pro_nom1 = u'Nique'
         p2.pro_email = u'vero@nique.be'
         p2.pro_pass = u''
-        p3 = Proprietaire()
-        p3.pro_pk = 3
-        p3.pro_etat = True
+        p3 = Proprietaire(3)
         p3.pro_prenom1 = u'Jeff'
         p3.pro_nom1 = u'Roche'
         p3.pro_email = u'jfroche@pyxel.be'
-        p3.pro_pass = u'tototo'
-        p4 = Proprietaire()
-        p4.pro_pk = 4
-        p4.pro_prenom1 = u'Alain'
-        p4.pro_nom1 = u'Meurant'
-        p4.pro_email = u'alain@meurant.be'
-        p4.pro_pass = u'tototo'
-        p4.pro_etat = False
+        p3.pro_pass = u''
         session = self.pg.getProprioSession()
-        session.add(p1)
-        session.add(p2)
-        session.add(p3)
-        session.add(p4)
+        session.save(p1)
+        session.save(p2)
+        session.save(p3)
         session.flush()
 
     def _createLDAPStructure(self, ldapConnection):
@@ -141,5 +116,4 @@ class LDAPImportTestCase(unittest.TestCase):
     def tearDown(self):
         fakeldap.clearLDAP()
         self.pg.disconnect()
-        while PROPRIO_LOGIN_REGISTRY:
-            PROPRIO_LOGIN_REGISTRY.pop()
+

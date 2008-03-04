@@ -12,8 +12,7 @@ from StringIO import StringIO
 
 from gites.ldapimport.interfaces import ILDAPProprietaire
 from zope.interface import implements
-
-BASE_DN = 'dc=gitesdewallonie,dc=net'
+from gites.ldapimport.ldapConnection import USER_BASE_DN
 
 class LDAPProprietaire(object):
     """
@@ -24,18 +23,25 @@ class LDAPProprietaire(object):
     def __init__(self, context):
         self.context = context
 
-    def ldif(self):
-        out = StringIO()
-        ldifEntry = ldif.LDIFWriter(out)
-        entry=dict(objectClass=['person', 'organizationalPerson',
-                                'gites-proprietaire'],
+    def extract(self):
+        """
+        return dn and props
+        """
+        entryAttributes = dict(objectClass=['person', 'organizationalPerson',
+                                            'gites-proprietaire'],
                    cn=[self.context.id],
                    registeredAddress=[self.context.email],
                    pk=[str(self.context.pro_pk)],
                    title=[self.context.title],
                    userPassword=[self.context.password])
-        dn = "cn=%s,%s" % (self.context.id, BASE_DN)
-        ldifEntry.unparse(dn, entry)
+        dn = "cn=%s,%s" % (self.context.id, USER_BASE_DN)
+        return dn, entryAttributes
+
+    def ldif(self):
+        out = StringIO()
+        ldifEntry = ldif.LDIFWriter(out)
+        dn, entryAttributes = self.extract()
+        ldifEntry.unparse(dn, entryAttributes)
         ldifContent = out.getvalue()
         out.close()
         return ldifContent
