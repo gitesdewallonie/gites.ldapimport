@@ -32,15 +32,33 @@ class ImportProprietaire(object):
 
     def createLdiff(self):
         session = self.pg.getProprioSession()
+        ldifs = []
         for proprietaire in self.getProprietaires(session):
             ldapProprio = registry.queryAdapter(proprietaire,
                                                 ILDAPProprietaire)
-            ldapProprio.ldif()
+            ldifs.append(ldapProprio.ldif())
         session.flush()
+        return "\n".join(ldifs)
 
-if __name__ == "__main__":
+    def updateLDAP(self):
+        session = self.pg.getProprioSession()
+        for proprietaire in self.getProprietaires(session):
+            ldapProprio = registry.queryAdapter(proprietaire,
+                                                ILDAPProprietaire)
+            dn, entryAttributes = ldapProprio.extract()
+            if self.ldap.searchUser(proprietaire.id):
+                self.ldap.updateUser(dn, entryAttributes)
+            else:
+                self.ldap.addUser(dn, entryAttributes)
+                self.ldap.addUserToGroup(dn, 'proprietaire')
+
+def main():
     pg = PGDB('jfroche', 'xMLMY4', 'localhost', 5432, 'gites_wallons')
     ldap = LDAP('ldap://localhost', 'dc=gitesdewallonie,dc=net', 'ph0neph0ne')
     prorioImport = ImportProprietaire(pg, ldap)
     prorioImport.connect()
     prorioImport.createLdiff()
+
+if __name__ == "__main__":
+    main()
+

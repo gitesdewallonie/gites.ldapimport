@@ -18,16 +18,20 @@ class Proprietaire(object):
     implements(IProprietaire)
 
     def getId(self):
-        prenom = normalizeString(self.pro_prenom1[:3].lower())
-        nom = normalizeString(self.pro_nom1[:3].lower())
-        return "%s%s" % (prenom, nom)
+        if not bool(self.pro_log) or \
+           self.pro_log == 'None' or self.pro_log == '0':
+
+            prenom = normalizeString(self.pro_prenom1[:3].lower())
+            nom = normalizeString(self.pro_nom1[:3].lower())
+            self.pro_log = "%s%s" % (prenom, nom)
+        return self.pro_log
 
     id = property(getId)
 
     def getEmail(self):
         mail = self.pro_email
         if not mail.strip():
-            mail = 'michael.gdw@skynet.be'
+            mail = u'michael.gdw@skynet.be'
         return mail
 
     email = property(getEmail)
@@ -38,7 +42,8 @@ class Proprietaire(object):
     title = property(getTitle)
 
     def getPassword(self):
-        if not bool(self.pro_pass):
+        if not bool(self.pro_pass) or \
+           self.pro_pass == 'None' or self.pro_pass == '0':
             self.pro_pass = generatePassword(5)
         return self.pro_pass
 
