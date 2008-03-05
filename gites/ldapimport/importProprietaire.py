@@ -51,6 +51,7 @@ class ImportProprietaire(object):
             else:
                 self.ldap.addUser(dn, entryAttributes)
                 self.ldap.addUserToGroup(dn, 'proprietaire')
+        session.flush()
 
 def main():
     pg = PGDB('jfroche', 'xMLMY4', 'localhost', 5432, 'gites_wallons')
