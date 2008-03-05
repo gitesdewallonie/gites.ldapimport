@@ -55,6 +55,8 @@ class ImportProprietaireTest(LDAPImportTestCase):
         self.assertEqual(groupMembers, ['cn=jefroc,ou=users,dc=gitesdewallonie,dc=net',
                                         u'cn=jeabon,ou=users,dc=gitesdewallonie,dc=net',
                                         u'cn=verniq,ou=users,dc=gitesdewallonie,dc=net'])
+        jeffUser = self.importer.ldap.searchUser('jefroc')
+        self.assertEqual(jeffUser[0][1].get('userPassword'), ['tototo'])
 
     def testGetProprietaires(self):
         self._fillDB()
