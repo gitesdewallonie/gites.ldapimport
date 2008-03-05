@@ -93,7 +93,7 @@ class LDAPImportTestCase(unittest.TestCase):
         p3.pro_prenom1 = u'Jeff'
         p3.pro_nom1 = u'Roche'
         p3.pro_email = u'jfroche@pyxel.be'
-        p3.pro_pass = u''
+        p3.pro_pass = u'tototo'
         session = self.pg.getProprioSession()
         session.save(p1)
         session.save(p2)
