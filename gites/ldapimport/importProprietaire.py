@@ -54,10 +54,11 @@ class ImportProprietaire(object):
 
 def main():
     pg = PGDB('jfroche', 'xMLMY4', 'localhost', 5432, 'gites_wallons')
-    ldap = LDAP('ldap://localhost', 'dc=gitesdewallonie,dc=net', 'ph0neph0ne')
-    prorioImport = ImportProprietaire(pg, ldap)
-    prorioImport.connect()
-    prorioImport.createLdiff()
+    ldap = LDAP('ldap://localhost', 'cn=admin,dc=gitesdewallonie,dc=net', 'phoneph0ne')
+    proprioImport = ImportProprietaire(pg, ldap)
+    proprioImport.connect()
+    #proprioImport.createLdiff()
+    proprioImport.updateLDAP()
 
 if __name__ == "__main__":
     main()

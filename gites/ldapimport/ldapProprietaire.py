@@ -30,10 +30,11 @@ class LDAPProprietaire(object):
         entryAttributes = dict(objectClass=['person', 'organizationalPerson',
                                             'gites-proprietaire'],
                    cn=[self.context.id],
-                   registeredAddress=[self.context.email],
+                   sn=[self.context.id],
+                   registeredAddress=[str(self.context.email)],
                    pk=[str(self.context.pro_pk)],
-                   title=[self.context.title],
-                   userPassword=[self.context.password])
+                   title=[str(self.context.title)],
+                   userPassword=[str(self.context.password)])
         dn = "cn=%s,%s" % (self.context.id, USER_BASE_DN)
         return dn, entryAttributes
 
