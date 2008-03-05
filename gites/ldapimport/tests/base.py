@@ -14,6 +14,7 @@ from gites.ldapimport.proprietaire import Proprietaire
 from gites.ldapimport.tests import fakeldap
 from gites.ldapimport.ldapConnection import LDAP
 from gites.ldapimport.pg import PGDB
+from gites.ldapimport.registry import PROPRIO_LOGIN_REGISTRY
 import unittest
 import sys
 
@@ -116,4 +117,5 @@ class LDAPImportTestCase(unittest.TestCase):
     def tearDown(self):
         fakeldap.clearLDAP()
         self.pg.disconnect()
+        while PROPRIO_LOGIN_REGISTRY: PROPRIO_LOGIN_REGISTRY.pop()
 

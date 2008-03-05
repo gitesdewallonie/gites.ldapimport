@@ -21,6 +21,7 @@ objectClass: organizationalPerson
 objectClass: gites-proprietaire
 pk: 2
 registeredAddress: vero@nique.be
+sn: verniq
 title: Vero Nique
 """
 

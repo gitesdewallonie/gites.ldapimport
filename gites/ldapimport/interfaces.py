@@ -18,3 +18,8 @@ class ILDAPProprietaire(Interface):
     """
     LDAP view on a proprietaire
     """
+
+class INameChooser(Interface):
+    """
+    Name chooser: define the unique id of an object
+    """

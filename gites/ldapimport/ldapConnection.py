@@ -27,7 +27,7 @@ class LDAP(object):
         """
         """
         self._connection = ldap.initialize(self.server)
-        self._connection.simple_bind(self.managerDn,
+        print self._connection.simple_bind(self.managerDn,
                                      self.managerPwd)
 
     def close(self):
@@ -44,7 +44,7 @@ class LDAP(object):
         groupDn = group[0][0]
         uniqueMembers = group[0][1].get('uniqueMember', [])
         if dn not in uniqueMembers:
-            uniqueMembers.append(dn)
+            uniqueMembers.append(str(dn))
         self._connection.modify_s(groupDn, [(ldap.MOD_REPLACE,
                                              'uniqueMember',
                                              uniqueMembers)])

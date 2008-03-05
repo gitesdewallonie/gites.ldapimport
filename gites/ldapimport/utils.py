@@ -36,11 +36,19 @@ def normalizeString(text):
                 res += mapping_latin_chars.get(ordinal)
     return res
 
-def generatePassword(passwordLength):
+def generateRandomPassword(passwordLength):
     """
     A simple script for making random passwords, WITHOUT 1,l,O,0.  Because
     those characters are hard to tell the difference between in some fonts.
 
     """
-    return ''.join([choice(string.letters+string.digits) for i in range(1,8)])
+    return ''.join([choice(string.letters+string.digits) for i in range(1,passwordLength)])
+
+def generateRandomLogin():
+    """
+    A simple script for making random passwords, WITHOUT 1,l,O,0.  Because
+    those characters are hard to tell the difference between in some fonts.
+
+    """
+    return generateRandomPassword(6)
 

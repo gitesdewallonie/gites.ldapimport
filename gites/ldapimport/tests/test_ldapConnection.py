@@ -32,6 +32,18 @@ class LDAPTest(LDAPImportTestCase):
         searchResult = self.ldapConn.searchAll()
         self.assertEqual(len(searchResult), 1)
 
+    def testUpdateUser(self):
+        self._fillLDAP(self.ldapConn._connection)
+        result = self.ldapConn.searchUser('jefroc')
+        self.assertEqual(result[0][1].get('registeredAddress'),
+                         ['jfroche@pyxel.be'])
+        userDn = result[0][0]
+        userAttributes = dict(registeredAddress=['jfroche@affinitic.be'])
+        self.ldapConn.updateUser(userDn, userAttributes)
+        result = self.ldapConn.searchUser('jefroc')
+        self.assertEqual(result[0][1].get('registeredAddress'),
+                         ['jfroche@affinitic.be'])
+
     def testLDAPAddOutsideUserOU(self):
         dn = 'cn=verniq,dc=gitesdewallonie,dc=net'
         userAttributes = {'registeredAddress': [u'vero@nique.be'],
@@ -42,6 +54,35 @@ class LDAPTest(LDAPImportTestCase):
         self.ldapConn.addUser(dn, userAttributes)
         searchResult = self.ldapConn.searchAll()
         self.assertEqual(len(searchResult), 0)
+
+    def testAddUserToUnexistingGroup(self):
+        self._fillLDAP(self.ldapConn._connection)
+        dn = 'cn=fakeuser,ou=users,dc=gitesdewallonie,dc=net'
+        self.assertRaises(AttributeError, self.ldapConn.addUserToGroup ,
+                          dn, 'unknownGroup')
+
+    def testAddExistingUserToGroup(self):
+        self._fillLDAP(self.ldapConn._connection)
+        result = self.ldapConn.searchGroup('proprietaire')
+        dn = 'cn=jefroc,ou=users,dc=gitesdewallonie,dc=net'
+        self.assertEqual(result[0][1].get('uniqueMember'),
+                         [dn])
+        self.ldapConn.addUserToGroup(dn, 'proprietaire')
+        result = self.ldapConn.searchGroup('proprietaire')
+        self.assertEqual(result[0][1].get('uniqueMember'),
+                         [dn])
+
+    def testAddUserToGroup(self):
+        self._fillLDAP(self.ldapConn._connection)
+        dn = 'cn=fakeuser,ou=users,dc=gitesdewallonie,dc=net'
+        result = self.ldapConn.searchGroup('proprietaire')
+        self.assertEqual(result[0][1].get('uniqueMember'),
+                         ['cn=jefroc,ou=users,dc=gitesdewallonie,dc=net'])
+        self.ldapConn.addUserToGroup(dn, 'proprietaire')
+        result = self.ldapConn.searchGroup('proprietaire')
+        self.assertEqual(result[0][1].get('uniqueMember'),
+                         ['cn=jefroc,ou=users,dc=gitesdewallonie,dc=net',
+                          'cn=fakeuser,ou=users,dc=gitesdewallonie,dc=net'])
 
     def testLDAPSearch(self):
         self._fillLDAP(self.ldapConn._connection)
