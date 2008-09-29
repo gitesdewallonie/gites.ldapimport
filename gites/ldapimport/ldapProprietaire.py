@@ -13,6 +13,8 @@ from StringIO import StringIO
 from gites.ldapimport.interfaces import ILDAPProprietaire
 from zope.interface import implements
 from gites.ldapimport.ldapConnection import USER_BASE_DN
+from gites.ldapimport.utils import createLDAPPassword
+
 
 class LDAPProprietaire(object):
     """
@@ -27,6 +29,7 @@ class LDAPProprietaire(object):
         """
         return dn and props
         """
+        password = createLDAPPassword(str(self.context.password))
         entryAttributes = dict(objectClass=['person', 'organizationalPerson',
                                             'gites-proprietaire'],
                    cn=[self.context.id],
@@ -46,4 +49,3 @@ class LDAPProprietaire(object):
         ldifContent = out.getvalue()
         out.close()
         return ldifContent
-

@@ -13,6 +13,7 @@ from gites.ldapimport.ldapConnection import LDAP
 from gites.ldapimport.interfaces import ILDAPProprietaire
 from gites.ldapimport.registry import registry
 
+
 class ImportProprietaire(object):
     """
     Import proprietaire to ldif format in ldap
@@ -51,7 +52,9 @@ class ImportProprietaire(object):
             else:
                 self.ldap.addUser(dn, entryAttributes)
                 self.ldap.addUserToGroup(dn, 'proprietaire')
+            session.save_or_update(proprietaire)
         session.flush()
+
 
 def main():
     pg = PGDB('jfroche', 'xMLMY4', 'localhost', 5432, 'gites_wallons')
@@ -63,4 +66,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
