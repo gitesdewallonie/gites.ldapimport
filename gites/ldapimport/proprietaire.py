@@ -12,6 +12,7 @@ from zope.interface import implements
 from gites.ldapimport.interfaces import IProprietaire, INameChooser
 from gites.ldapimport.registry import PROPRIO_LOGIN_REGISTRY, registry
 
+
 class Proprietaire(object):
     """
     Un proprietaire
@@ -47,5 +48,3 @@ class Proprietaire(object):
         return self.pro_pass
 
     password = property(getPassword)
-
-

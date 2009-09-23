@@ -16,7 +16,7 @@ class LDAPTest(LDAPImportTestCase):
         self.assertEqual(len(searchResult), 0)
         self._fillLDAP(self.ldapConn._connection)
         searchResult = self.ldapConn.searchAll()
-        self.assertEqual(len(searchResult), 1)
+        self.assertEqual(len(searchResult), 2)
 
     def testLDAPAddInUserOU(self):
         searchResult = self.ldapConn.searchAll()
