@@ -29,7 +29,7 @@ class ImportProprietaire(object):
         self.ldap.connect()
 
     def getProprietaires(self, session):
-        return session.query(Proprietaire).select()
+        return session.query(Proprietaire).all()
 
     def createLdiff(self):
         session = self.pg.getProprioSession()
@@ -48,11 +48,16 @@ class ImportProprietaire(object):
                                                 ILDAPProprietaire)
             dn, entryAttributes = ldapProprio.extract()
             if self.ldap.searchUser(proprietaire.id):
-                self.ldap.updateUser(dn, entryAttributes)
+                if proprietaire.pro_etat == False:
+                    self.ldap.removeUser(dn)
+                    continue
+                else:
+                    self.ldap.updateUser(dn, entryAttributes)
             else:
-                self.ldap.addUser(dn, entryAttributes)
-                self.ldap.addUserToGroup(dn, 'proprietaire')
-            session.save_or_update(proprietaire)
+                if proprietaire.pro_etat == True:
+                    self.ldap.addUser(dn, entryAttributes)
+                    self.ldap.addUserToGroup(dn, 'proprietaire')
+            session.add(proprietaire)
         session.flush()
 
 

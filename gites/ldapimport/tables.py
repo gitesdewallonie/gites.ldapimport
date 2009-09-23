@@ -7,12 +7,12 @@ Copyright by Affinitic sprl
 
 $Id$
 """
+from sqlalchemy import Table, Column, String, Integer, Index, Boolean
 
-from sqlalchemy import Table, Column, String, Integer, Index
 
 def getProprio(metadata):
     autoload = False
-    if metadata.engine.has_table('proprio'):
+    if metadata.bind.has_table('proprio'):
         autoload = True
     proprio = Table('proprio', metadata,
                  Column(u'pro_pk', Integer(), primary_key=True),
@@ -32,7 +32,7 @@ def getProprio(metadata):
                  Column(u'pro_url', String()),
                  Column(u'pro_tva', String()),
                  Column(u'pro_comment', String()),
-                 Column(u'pro_etat', String()),
+                 Column(u'pro_etat', Boolean()),
                  Column(u'pro_desact_comment', String()),
                  Column(u'pro_desact_justif', String()),
                  Column(u'pro_date_in', String()),
@@ -46,4 +46,3 @@ def getProprio(metadata):
                  Column(u'pro_civ_fk', Integer()), autoload=autoload)
     Index('proprio_pkey', proprio.c.pro_pk, unique=True)
     return proprio
-

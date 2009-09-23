@@ -12,10 +12,12 @@ import ldap
 USER_BASE_DN = u"ou=users,dc=gitesdewallonie,dc=net"
 GROUP_BASE_DN = u"ou=groups,dc=gitesdewallonie,dc=net"
 
+
 class LDAP(object):
     """
     An ldap connection
     """
+
     def __init__(self, server, managerDn, managerPwd):
         """
         """
@@ -37,10 +39,13 @@ class LDAP(object):
         attributes = [(key, item) for key, item in userAttributes.items()]
         return self._connection.add_s(dn, attributes)
 
+    def removeUser(self, dn):
+        return self._connection.delete_s(dn)
+
     def addUserToGroup(self, dn, groupId):
         group = self.searchGroup(groupId)
         if not group:
-            raise AttributeError, "Can't find group: %s" % groupId
+            raise AttributeError("Can't find group: %s" % groupId)
         groupDn = group[0][0]
         uniqueMembers = group[0][1].get('uniqueMember', [])
         if dn not in uniqueMembers:
@@ -68,4 +73,3 @@ class LDAP(object):
         filterSearch = u"(objectClass=person)"
         return self._connection.search_s(USER_BASE_DN, ldap.SCOPE_SUBTREE,
                                          filterSearch)
-

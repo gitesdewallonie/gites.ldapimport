@@ -25,7 +25,9 @@ sn: verniq
 title: Vero Nique
 """
 
+
 class ImportProprietaireTest(LDAPImportTestCase):
+
     def setUp(self):
         super(ImportProprietaireTest, self).setUp()
         self.importer = ImportProprietaire(self.pg, self.ldapConn)
@@ -46,7 +48,7 @@ class ImportProprietaireTest(LDAPImportTestCase):
         self._fillDB()
         self._fillLDAP(self.importer.ldap._connection)
         result = self.importer.ldap.searchAll()
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
         self.importer.updateLDAP()
         result = self.importer.ldap.searchAll()
         self.assertEqual(len(result), 3)
@@ -57,12 +59,13 @@ class ImportProprietaireTest(LDAPImportTestCase):
                                         u'cn=verniq,ou=users,dc=gitesdewallonie,dc=net'])
         jeffUser = self.importer.ldap.searchUser('jefroc')
         self.assertEqual(jeffUser[0][1].get('userPassword'), ['tototo'])
+        self.assertEqual(len(self.importer.ldap.searchAll()), 3)
 
     def testGetProprietaires(self):
         self._fillDB()
         session = self.importer.pg.getProprioSession()
         proprios = self.importer.getProprietaires(session)
-        self.assertEqual(len(proprios), 3)
+        self.assertEqual(len(proprios), 4)
 
     def testCreateLdifWithoutPassword(self):
         self._fillDB()
