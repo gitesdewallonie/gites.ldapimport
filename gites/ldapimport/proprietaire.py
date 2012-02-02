@@ -4,6 +4,7 @@ gites.ldapimport
 
 Licensed under the GPL license, see LICENCE.txt for more details.
 Copyright by Affinitic sprl
+test2
 
 Test Seb
 """
