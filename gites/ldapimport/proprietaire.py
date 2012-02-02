@@ -4,8 +4,6 @@ gites.ldapimport
 
 Licensed under the GPL license, see LICENCE.txt for more details.
 Copyright by Affinitic sprl
-
-$Id$
 """
 from utils import generateRandomPassword
 from zope.interface import implements
