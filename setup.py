@@ -30,7 +30,6 @@ setup(
         'setuptools',
         'sqlalchemy',
         'psycopg2',
-        'egenix-mx-base',
         'pysqlite',
         'python-ldap',
         'zope.interface'
