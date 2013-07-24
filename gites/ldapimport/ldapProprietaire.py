@@ -36,7 +36,7 @@ class LDAPProprietaire(object):
                    sn=[str(self.context.id)],
                    registeredAddress=[str(self.context.email)],
                    pk=[str(self.context.pro_pk)],
-                   title=[str(self.context.title)],
+                   title=[str(self.context.title.encode('utf8'))],
                    userPassword=[str(self.context.password)])
         dn = "cn=%s,%s" % (self.context.id, USER_BASE_DN)
         return dn, entryAttributes
