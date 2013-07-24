@@ -32,8 +32,8 @@ class LDAPProprietaire(object):
         password = createLDAPPassword(str(self.context.password))
         entryAttributes = dict(objectClass=['person', 'organizationalPerson',
                                             'gites-proprietaire'],
-                   cn=[self.context.id],
-                   sn=[self.context.id],
+                   cn=[str(self.context.id)],
+                   sn=[str(self.context.id)],
                    registeredAddress=[str(self.context.email)],
                    pk=[str(self.context.pro_pk)],
                    title=[str(self.context.title)],
