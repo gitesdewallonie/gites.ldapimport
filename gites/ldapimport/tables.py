@@ -29,7 +29,6 @@ def getProprio(metadata):
                  Column(u'pro_fax_bur', String()),
                  Column(u'pro_gsm1', String()),
                  Column(u'pro_gsm2', String()),
-                 Column(u'pro_url', String()),
                  Column(u'pro_tva', String()),
                  Column(u'pro_comment', String()),
                  Column(u'pro_etat', Boolean()),
