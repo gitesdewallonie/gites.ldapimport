@@ -24,7 +24,8 @@ class Proprietaire(object):
         if not bool(self.pro_log) or \
            self.pro_log == 'None' or self.pro_log == '0':
             self.pro_log = registry.queryAdapter(self, INameChooser).getLogin()
-        PROPRIO_LOGIN_REGISTRY.append(self.pro_log)
+        if self.pro_etat:
+            PROPRIO_LOGIN_REGISTRY.append(self.pro_log)
         return self.pro_log
 
     id = property(getId)
