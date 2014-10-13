@@ -7,7 +7,7 @@ Copyright by Affinitic sprl
 
 $Id$
 """
-
+from sqlalchemy import desc
 from affinitic.pwmanager.pwmanager import PasswordManager
 
 from gites.ldapimport.proprietaire import Proprietaire
@@ -32,7 +32,7 @@ class ImportProprietaire(object):
         self.ldap.connect()
 
     def getProprietaires(self, session):
-        return session.query(Proprietaire).all()
+        return session.query(Proprietaire).order_by(Proprietaire.pro_etat, desc(Proprietaire.pro_pk)).all()
 
     def createLdiff(self):
         session = self.pg.getProprioSession()
@@ -52,12 +52,14 @@ class ImportProprietaire(object):
             dn, entryAttributes = ldapProprio.extract()
             if self.ldap.searchUser(proprietaire.id):
                 if proprietaire.pro_etat == False:
+                    print 'removing %s' % dn
                     self.ldap.removeUser(dn)
                     continue
                 else:
                     self.ldap.updateUser(dn, entryAttributes)
             else:
                 if proprietaire.pro_etat == True:
+                    print 'adding %s' % dn
                     self.ldap.addUser(dn, entryAttributes)
                     self.ldap.addUserToGroup(dn, 'proprietaire')
             session.add(proprietaire)
