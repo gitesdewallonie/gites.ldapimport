@@ -55,8 +55,8 @@ class ImportProprietaireTest(LDAPImportTestCase):
         proprietaireGroup = self.importer.ldap.searchGroup('proprietaire')
         groupMembers = proprietaireGroup[0][1].get('uniqueMember')
         self.assertEqual(groupMembers, ['cn=jefroc,ou=users,dc=gitesdewallonie,dc=net',
-                                        u'cn=jeabon,ou=users,dc=gitesdewallonie,dc=net',
-                                        u'cn=verniq,ou=users,dc=gitesdewallonie,dc=net'])
+                                        u'cn=verniq,ou=users,dc=gitesdewallonie,dc=net',
+                                        u'cn=jeabon,ou=users,dc=gitesdewallonie,dc=net'])
         jeffUser = self.importer.ldap.searchUser('jefroc')
         self.assertEqual(jeffUser[0][1].get('userPassword'), ['tototo'])
         self.assertEqual(len(self.importer.ldap.searchAll()), 3)
