@@ -50,5 +50,5 @@ class PGDB(object):
         del self.engine
 
     def truncate(self, table):
-        self.db.drop(table, checkfirst=True)
+        table.drop(checkfirst=True)
         table.create()
