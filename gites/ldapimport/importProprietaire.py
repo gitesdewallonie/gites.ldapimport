@@ -14,7 +14,7 @@ from gites.ldapimport.proprietaire import Proprietaire
 from gites.ldapimport.pg import PGDB
 from gites.ldapimport.ldapConnection import LDAP
 from gites.ldapimport.interfaces import ILDAPProprietaire
-from gites.ldapimport.registry import registry
+from gites.ldapimport.registry import PROPRIO_LOGIN_REGISTRY, registry
 
 
 class ImportProprietaire(object):
@@ -34,6 +34,10 @@ class ImportProprietaire(object):
     def getProprietaires(self, session):
         return session.query(Proprietaire).order_by(Proprietaire.pro_etat, desc(Proprietaire.pro_pk)).all()
 
+    def fillLoginsRegistry(self, session):
+        activeProprios = session.query(Proprietaire).filter(Proprietaire.pro_etat == True).all()
+        PROPRIO_LOGIN_REGISTRY.extend([proprio.pro_log for proprio in activeProprios])
+
     def createLdiff(self):
         session = self.pg.getProprioSession()
         ldifs = []
@@ -46,6 +50,7 @@ class ImportProprietaire(object):
 
     def updateLDAP(self):
         session = self.pg.getProprioSession()
+        self.fillLoginsRegistry(session)
         for proprietaire in self.getProprietaires(session):
             ldapProprio = registry.queryAdapter(proprietaire,
                                                 ILDAPProprietaire)

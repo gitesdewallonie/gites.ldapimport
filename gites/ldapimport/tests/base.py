@@ -127,6 +127,30 @@ class LDAPImportTestCase(unittest.TestCase):
         session.add(p4)
         session.flush()
 
+    def _fillDuplicatesDB(self):
+        p1 = Proprietaire()
+        p1.pro_pk = 1
+        p1.pro_etat = True
+        p1.pro_prenom1 = u'Jeanne'
+        p1.pro_nom1 = u'Bonne'
+        p1.pro_email = u'jeanne@bonne.au'
+        p1.pro_log = None
+        p1.pro_pass = None
+        p1.pro_etat = True
+        p2 = Proprietaire()
+        p2.pro_pk = 2
+        p2.pro_etat = True
+        p2.pro_prenom1 = u'Jean'
+        p2.pro_nom1 = u'Bon'
+        p2.pro_email = u'jean@bon.au'
+        p1.pro_log = 'jeabon'
+        p1.pro_pass = 'tototo'
+        p2.pro_etat = True
+        session = self.pg.getProprioSession()
+        session.add(p1)
+        session.add(p2)
+        session.flush()
+
     def _createLDAPStructure(self, ldapConnection):
         for dn, props in BASE.items():
             ldapConnection.add_s(dn, props)
@@ -134,8 +158,8 @@ class LDAPImportTestCase(unittest.TestCase):
         for dn, props in OU_BASE.items():
             ldapConnection.add_s(dn, props)
 
-    def _fillLDAP(self, ldapConnection):
-        for dn, props in USERS.items():
+    def _fillLDAP(self, ldapConnection, users=USERS):
+        for dn, props in users.items():
             ldapConnection.add_s(dn, props)
 
         for dn, props in GROUPS.items():

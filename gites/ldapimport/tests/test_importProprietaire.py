@@ -61,6 +61,30 @@ class ImportProprietaireTest(LDAPImportTestCase):
         self.assertEqual(jeffUser[0][1].get('userPassword'), ['tototo'])
         self.assertEqual(len(self.importer.ldap.searchAll()), 3)
 
+    def testSpecialDuplicates(self):
+        self._fillDuplicatesDB()
+        USER = {'cn=jeabon,ou=users,dc=gitesdewallonie,dc=net':
+                [('objectClass', ['person', 'organizationalPerson',
+                                  'gites-proprietaire']),
+                 ('cn', ['jeabon']),
+                 ('registeredAddress', ['jean@bon.au']),
+                 ('pk', ['2']),
+                 ('title', ['Jean Bon']),
+                 ('userPassword', ['tototo'])]}
+        self._fillLDAP(self.importer.ldap._connection, users=USER)
+        result = self.importer.ldap.searchAll()
+        self.assertEqual(len(result), 1)
+        self.importer.updateLDAP()
+        result = self.importer.ldap.searchAll()
+        self.assertEqual(len(result), 2)
+        jeabon = self.importer.ldap.searchUser('jeabon')
+        self.assertEqual(jeabon[0][1].get('userPassword'), ['tototo'])
+        jeabon1 = self.importer.ldap.searchUser('jeabon-1')
+        self.assertEqual(len(jeabon1[0][1].get('userPassword')[0]), 4)
+        session = self.importer.pg.getProprioSession()
+        proprio = session.query(Proprietaire).filter_by(pro_log=u'jeabon-1').one()
+        self.failIf(proprio.pro_pass is None)
+
     def testGetProprietaires(self):
         self._fillDB()
         session = self.importer.pg.getProprioSession()

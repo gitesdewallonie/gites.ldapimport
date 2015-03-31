@@ -11,7 +11,7 @@ Test Seb
 from utils import generateRandomPassword
 from zope.interface import implements
 from gites.ldapimport.interfaces import IProprietaire, INameChooser
-from gites.ldapimport.registry import PROPRIO_LOGIN_REGISTRY, registry
+from gites.ldapimport.registry import registry
 
 
 class Proprietaire(object):
@@ -24,8 +24,6 @@ class Proprietaire(object):
         if not bool(self.pro_log) or \
            self.pro_log == 'None' or self.pro_log == '0':
             self.pro_log = registry.queryAdapter(self, INameChooser).getLogin()
-        if self.pro_etat:
-            PROPRIO_LOGIN_REGISTRY.append(self.pro_log)
         return self.pro_log
 
     id = property(getId)
