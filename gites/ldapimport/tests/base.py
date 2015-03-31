@@ -96,6 +96,7 @@ class LDAPImportTestCase(unittest.TestCase):
         p1.pro_nom1 = u'Bon'
         p1.pro_email = u'jean@bon.au'
         p1.pro_pass = u'x24eee'
+        p1.pro_etat = True
         p2 = Proprietaire()
         p2.pro_pk = 2
         p2.pro_etat = True
@@ -103,6 +104,7 @@ class LDAPImportTestCase(unittest.TestCase):
         p2.pro_nom1 = u'Nique'
         p2.pro_email = u'vero@nique.be'
         p2.pro_pass = u''
+        p2.pro_etat = True
         p3 = Proprietaire()
         p3.pro_pk = 3
         p3.pro_etat = True
@@ -110,6 +112,7 @@ class LDAPImportTestCase(unittest.TestCase):
         p3.pro_nom1 = u'Roche'
         p3.pro_email = u'jfroche@pyxel.be'
         p3.pro_pass = u'tototo'
+        p3.pro_etat = True
         p4 = Proprietaire()
         p4.pro_pk = 4
         p4.pro_prenom1 = u'Alain'

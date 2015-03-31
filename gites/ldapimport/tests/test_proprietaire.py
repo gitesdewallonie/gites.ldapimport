@@ -20,6 +20,7 @@ class ProprietaireTest(unittest.TestCase):
         proprio1.pro_prenom1 = 'Jean'
         proprio1.pro_nom1 = 'Bonn'
         proprio1.pro_log = ''
+        proprio1.pro_etat = True
         self.assertEqual(proprio1.id, 'jeabon')
         self.assertEqual(proprio1.pro_log, 'jeabon')
 
@@ -28,6 +29,7 @@ class ProprietaireTest(unittest.TestCase):
         proprio1.pro_prenom1 = ''
         proprio1.pro_nom1 = ''
         proprio1.pro_log = ''
+        proprio1.pro_etat = True
         self.assertNotEqual(proprio1.id, '')
         self.assertNotEqual(proprio1.pro_log, '')
 
@@ -36,6 +38,7 @@ class ProprietaireTest(unittest.TestCase):
         proprio1.pro_prenom1 = 'Jean'
         proprio1.pro_nom1 = 'Bonne'
         proprio1.pro_log = ''
+        proprio1.pro_etat = True
         PROPRIO_LOGIN_REGISTRY.append('jeabon')
         self.assertEqual(proprio1.id, 'jeabon-1')
         self.assertEqual(proprio1.pro_log, 'jeabon-1')
